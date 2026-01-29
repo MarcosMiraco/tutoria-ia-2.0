@@ -76,7 +76,6 @@ class GraphApp:
 			chain = ( prompt | self.llm )
 			def assistant_node(state: MessagesState) -> MessagesState:
 				response = chain.invoke({ "messages": state["messages"]})
-				print("ENTREI NO NODO")
 				return { "messages": response } 
 			return assistant_node
 	
