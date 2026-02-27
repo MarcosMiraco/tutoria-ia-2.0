@@ -1,0 +1,26 @@
+[project]
+name = "agent"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Ian Vieira Salgado",email = "vieira4ev@gmail.com"}
+]
+readme = "README.md"
+requires-python = "~3.13"
+dependencies = [
+    "langchain (>=1.2.10,<2.0.0)",
+    "langchain-community (>=0.4.1,<0.5.0)",
+    "langchain-openai (>=1.1.10,<2.0.0)",
+    "langgraph (>=1.0.9,<2.0.0)",
+    "python-dotenv (>=1.2.1,<2.0.0)",
+    "fastapi (>=0.132.0,<0.133.0)",
+    "uvicorn (>=0.41.0,<0.42.0)"
+]
+
+[tool.poetry]
+packages = [{include = "ai", from = "src"},{include = "client", from = "src"}, {include = "service", from = "src"}, {include = "controller", from = "src"}]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,55 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment
+.env
+.env.*
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+.mypy_cache/
+.pytest_cache/
+.coverage
+coverage.xml
+*.cover
+.hypothesis/
+.tox/
+.pylint.d/
+.pyre/
+.pytype/
+.cache/
+
+# VSCode
+.vscode/
+
+# MacOS
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# IDEs
+.idea/
+.history/
+.swp
+.swo
+
+# Build
+dist/
+build/
+out/
+

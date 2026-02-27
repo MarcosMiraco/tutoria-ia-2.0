@@ -1,0 +1,30 @@
+[project]
+name = "rag"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Ian Vieira Salgado",email = "vieira4ev@gmail.com"}
+]
+readme = "README.md"
+requires-python = "~3.13"
+dependencies = [
+    "fastapi (>=0.129.0,<0.130.0)",
+    "uvicorn (>=0.41.0,<0.42.0)",
+    "python-dotenv (>=1.2.1,<2.0.0)",
+    "llama-index (>=0.14.15,<0.15.0)",
+    "llama-index-readers-google (>=0.7.2,<0.8.0)",
+    "llama-index-vector-stores-milvus (>=1.0.0,<2.0.0)"
+]
+
+[tool.poetry]
+packages = [
+    {include = "api", from = "src"},
+    {include = "ingestion", from = "src"},
+    {include = "vectorstore", from = "src"},
+    {include = "services", from = "src"},
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
