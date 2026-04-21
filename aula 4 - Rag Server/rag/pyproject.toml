@@ -13,7 +13,9 @@ dependencies = [
     "python-dotenv (>=1.2.1,<2.0.0)",
     "llama-index (>=0.14.15,<0.15.0)",
     "llama-index-readers-google (>=0.7.2,<0.8.0)",
-    "llama-index-vector-stores-milvus (>=1.0.0,<2.0.0)"
+    "llama-index-vector-stores-milvus (>=1.0.0,<2.0.0)",
+    "llama-index-embeddings-ollama (>=0.9.0,<0.10.0)",
+    "llama-index-llms-ollama (>=0.10.1,<0.11.0)"
 ]
 
 [tool.poetry]

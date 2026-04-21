@@ -14,10 +14,11 @@ load_dotenv()
 
 
 
-class VendaSegurosAssistant:
+class GeneralAssistant:
 
     def __init__(self):
-        self.llm = init_chat_model(model="gpt-4o-mini", temperature=0.6)
+        # self.llm = init_chat_model(model="gpt-4o-mini", temperature=0.6)
+        self.llm = init_chat_model(model="qwen2.5:7b", temperature=0.6, model_provider="ollama")
         self.thread = { "configurable": { "thread_id": "agent-1" }}
         self.tools = [llm_rag_tool]
         self.graph = self.build_graph()
@@ -60,12 +61,16 @@ class VendaSegurosAssistant:
         # COMPILATION
         memory = MemorySaver()
         graph = builder.compile(checkpointer=memory)
-
         # self.save_graph_schema(graph)
         return graph
 
     def ask(self, query_input):
         initial_state = { "messages": [query_input] }
         final_state = self.graph.invoke(input=initial_state, config=self.thread)
+        
+        for message in reversed(final_state["messages"]):
+            if hasattr(message, "content") and message.content and not getattr(message, "tool_calls", None):
+                return message.content
+        
         return final_state["messages"][-1].content
     

@@ -46,3 +46,15 @@ class DirectoryLoader:
             recursive=True
         )
         return loader.load_data()
+
+@LoaderRegistry.register("md")
+class MarkdownLoader:
+    def load(self, source: str):
+        loader = SimpleDirectoryReader(
+            input_dir=source,
+            encoding="UTF-8",
+            required_exts=[".md"],
+            recursive=True
+        )
+
+        return loader.load_data()

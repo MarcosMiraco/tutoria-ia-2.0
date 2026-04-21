@@ -1,4 +1,4 @@
-from ai.graph import VendaSegurosAssistant
+from ai.graph import GeneralAssistant
 
 # DEBUG
 # class AgentStub:
@@ -8,7 +8,7 @@ from ai.graph import VendaSegurosAssistant
 
 class QAService:
     def __init__(self):
-        self.agent = VendaSegurosAssistant()
+        self.agent = GeneralAssistant()
 
     def handle_question(self, user_input: str) -> str:
         response = self.agent.ask(user_input)

@@ -1,6 +1,7 @@
 
 from llama_index.core.ingestion import IngestionPipeline
-from llama_index.embeddings.openai import OpenAIEmbedding, OpenAIEmbeddingModeModel
+# from llama_index.embeddings.openai import OpenAIEmbedding, OpenAIEmbeddingModeModel
+from llama_index.embeddings.ollama import OllamaEmbedding
 from ingestion.loaders import LoaderStrategy, LoaderRegistry
 from ingestion.chunker import ChunkerStrategy,ChunkerRegistry
 from ingestion.transformers import apply_document_transforms
@@ -29,9 +30,10 @@ class IngestionPipelineFactory:
 
         transformations = [
             self.chunker.get_transform(),
-            OpenAIEmbedding(
-                model=OpenAIEmbeddingModeModel.TEXT_EMBED_3_LARGE
-            ),
+            # OpenAIEmbedding(
+            #     model=OpenAIEmbeddingModeModel.TEXT_EMBED_3_LARGE
+            # ),
+            OllamaEmbedding(model_name="nomic-embed-text", base_url="http://localhost:11434")
         ]
         # CHUNK/EMBED
         pipeline = IngestionPipeline(

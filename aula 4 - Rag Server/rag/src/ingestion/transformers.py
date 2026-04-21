@@ -12,7 +12,8 @@ from bs4 import BeautifulSoup
 import re
 import unicodedata
 
-from llama_index.llms.openai import OpenAI
+# from llama_index.llms.openai import OpenAI
+from llama_index.llms.ollama import Ollama
 
 
 class DocumentTransformStrategy(Protocol):
@@ -73,7 +74,8 @@ class MTEHeaderDocumentExtractor:
 class LLMCategoryMetadataExtractor:
     def __init__(self):
         # Inicializa o LLM predictor
-        self.llm = OpenAI(model="gpt-4o-mini", temperature=0, max_output_tokens=100)
+        # self.llm = OpenAI(model="gpt-4o-mini", temperature=0, max_output_tokens=100)
+        self.llm = Ollama(model="qwen2.5:7b", temperature=0, request_timeout=60.0)
         self.allowed_categories = [
             "saúde", "varejo", "indústria", "educação", "hotelaria",
             "transporte", "financeiro", "tecnologia", "alimentação", "geral"
@@ -162,3 +164,61 @@ class NormalizeDocumentTransformer:
         text = "\n".join(lines)
         text = re.sub(r"\n{3,}", "\n\n", text)
         return text.strip()
+
+
+@DocumentTransformRegistry.register("obsidian-sanitizer")
+class ObsidianSanitizer:
+
+    def __call__(self, doc: Document) -> Document:
+        text = doc.text
+        text = self._remove_frontmatter_keys(text, keys=["cssclasses"])
+        text = self._remove_callout_lines(text)
+        text = self._clean_blockquote_bullets(text)
+        text = self._remove_span_tags(text)
+        return Document(text=text, metadata=doc.metadata)
+
+    @staticmethod
+    def _remove_frontmatter_keys(text: str, keys: list) -> str:
+        """Remove chaves específicas do frontmatter YAML."""
+        in_frontmatter = False
+        result = []
+        skip_block = False
+        i = 0
+        lines = text.splitlines()
+
+        for i, line in enumerate(lines):
+            if i == 0 and line.strip() == "---":
+                in_frontmatter = True
+                result.append(line)
+                continue
+            if in_frontmatter and line.strip() == "---":
+                in_frontmatter = False
+                skip_block = False
+                result.append(line)
+                continue
+            if in_frontmatter:
+                if any(line.startswith(k + ":") for k in keys):
+                    skip_block = True
+                    continue
+                if skip_block and line.startswith("  "):
+                    continue
+                else:
+                    skip_block = False
+            result.append(line)
+
+        return "\n".join(result)
+
+    @staticmethod
+    def _remove_callout_lines(text: str) -> str:
+        """Remove linhas com sintaxe >[!...] do Obsidian."""
+        return re.sub(r"^>{1,}\s*\[!.*?\]\s*$", "", text, flags=re.MULTILINE)
+
+    @staticmethod
+    def _clean_blockquote_bullets(text: str) -> str:
+        """Converte '>>- item' em '- item'."""
+        return re.sub(r"^>{1,}\s*-\s*", "- ", text, flags=re.MULTILINE)
+
+    @staticmethod
+    def _remove_span_tags(text: str) -> str:
+        """Remove tags <span> mantendo o texto interno."""
+        return re.sub(r"<span[^>]*>(.*?)</span>", r"\1", text)

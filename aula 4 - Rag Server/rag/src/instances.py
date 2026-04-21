@@ -12,7 +12,8 @@ async def get_vector_store():
                 vector_store = VectorStoreFactory.create(
                     "milvus",
                     collection_name="cct_docs",
-                    dim=3072,
+                    # dim=3072,
+                    dim=768,
                     uri="http://localhost:19530",
                     metric_type="COSINE",
                     M=32,

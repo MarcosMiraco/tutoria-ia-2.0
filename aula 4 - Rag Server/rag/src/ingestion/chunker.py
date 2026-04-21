@@ -34,6 +34,11 @@ class CctDocumentChunker:
         )
 
 
+@ChunkerRegistry.register("md")
+class MarkdownDocumentChunker:
+    def get_transform(self):
+        return MarkdownDocumentParser()
+
 
 class CCTClauseParser(NodeParser):
     max_tokens: int = 1800
@@ -153,3 +158,55 @@ class CCTClauseParser(NodeParser):
                 )
 
         return output_nodes
+    
+
+class MarkdownDocumentParser(NodeParser):
+    fallback_chunk_size: int = 512
+    fallback_overlap: int = 50
+
+    @property
+    def fallback_splitter(self):
+        return SentenceSplitter(
+            chunk_size=self.fallback_chunk_size,
+            chunk_overlap=self.fallback_overlap
+        )
+
+    def _parse_nodes(
+        self,
+        nodes: List[BaseNode],
+        **kwargs,
+    ) -> List[BaseNode]:
+        output_nodes: List[BaseNode] = []
+        for node in nodes:
+            text = node.get_content()
+            top_level = self._detect_top_level(text)
+
+            if top_level is None:
+                chunks = [c.strip() for c in text.split("\n\n") if c.strip()]
+            else:
+                chunks = self._split_by_heading(text, top_level)
+
+            for i, chunk in enumerate(chunks):
+                output_nodes.append(
+                    TextNode(
+                        text=chunk,
+                        metadata={**node.metadata, "chunk_index": i}
+                    )
+                )
+        return output_nodes
+
+    @staticmethod
+    def _detect_top_level(text: str) -> int | None:
+        """Retorna o menor nível de heading encontrado (1, 2, 3...) ou None."""
+        for level in range(1, 7):
+            pattern = re.compile(rf"^{'#' * level} .+", re.MULTILINE)
+            if pattern.search(text):
+                return level
+        return None
+
+    @staticmethod
+    def _split_by_heading(text: str, level: int) -> List[str]:
+        """Divide o texto nas ocorrências do heading do nível especificado."""
+        pattern = re.compile(rf"(?=^{'#' * level} )", re.MULTILINE)
+        parts = pattern.split(text)
+        return [p.strip() for p in parts if p.strip()]

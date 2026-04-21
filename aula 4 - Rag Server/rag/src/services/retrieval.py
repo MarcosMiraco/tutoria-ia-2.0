@@ -3,8 +3,11 @@ from instances import get_vector_store
 from llama_index.core.retrievers import VectorIndexRetriever
 from llama_index.core import StorageContext
 from llama_index.core import VectorStoreIndex
-from llama_index.embeddings.openai import OpenAIEmbedding, OpenAIEmbeddingModeModel
+# from llama_index.embeddings.openai import OpenAIEmbedding, OpenAIEmbeddingModeModel
+from llama_index.embeddings.ollama import OllamaEmbedding
 from ingestion.filters import MetadataFilterFactory
+
+
 class RetrievalService:
     _index: VectorIndexRetriever | None = None
 
@@ -17,9 +20,10 @@ class RetrievalService:
             vector_store=vs,
             storage_context=storage_context,
             response_mode="default",
-            embed_model=OpenAIEmbedding(
-                model=OpenAIEmbeddingModeModel.TEXT_EMBED_3_LARGE
-            )
+            # embed_model=OpenAIEmbedding(
+            #     model=OpenAIEmbeddingModeModel.TEXT_EMBED_3_LARGE
+            # )            
+            embed_model=OllamaEmbedding(model_name="nomic-embed-text", base_url="http://localhost:11434")
         )
         if filters:
             retriever = index.as_retriever(similarity_top_k=top_k, filters=filters)
